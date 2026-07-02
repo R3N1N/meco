@@ -1,0 +1,9 @@
+Optometrist/Doctor Account:
+Email: doctor@eyecare.com
+Password: doctor123
+Admin Account:
+Email: admin@eyecare.com
+Password: admin123
+Patient Account:
+Email: patient@eyecare.com
+Password: patient123

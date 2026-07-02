@@ -1,0 +1,230 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+
+
+@layer base {
+  body {
+    background-color: #FAFAF9 !important;
+    background-image: none !important;
+    color: #111827 !important;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+/* Glassmorphic Cards & Headers -> Luxury White Card */
+.glass {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.glass-accent {
+  background: rgba(30, 58, 138, 0.04) !important;
+  border: 1px solid rgba(30, 58, 138, 0.12) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* --- Premium Luxury Healthcare Color Theme Overrides --- */
+
+/* Navigation Bar Override: Navy background with white text */
+nav.glass {
+  background-color: #1E3A8A !important;
+  border-bottom: 1px solid #1E3A8A !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+nav.glass a,
+nav.glass span,
+nav.glass button {
+  color: #FFFFFF !important;
+}
+nav.glass a:hover,
+nav.glass button:hover {
+  color: #93C5FD !important; /* Soft Blue hover */
+}
+nav.glass .text-teal-400,
+nav.glass .text-teal-500 {
+  color: #D4AF37 !important; /* Gold logo/dashboard text */
+}
+nav.glass .group div.bg-teal-600 {
+  background-color: #D4AF37 !important; /* Gold logo icon background */
+}
+nav.glass .group div.bg-teal-600 svg {
+  color: #1E3A8A !important; /* Navy Blue logo eye icon */
+}
+
+/* Force dark text for readability on white card backgrounds and main panels */
+.glass .text-white,
+.glass h1,
+.glass h2,
+.glass h3,
+.glass h4,
+.glass h5,
+.glass h6,
+.glass span.text-white,
+.glass div.text-white,
+.glass label.text-white,
+.glass p.text-white {
+  color: #111827 !important;
+}
+
+/* Make sure active sidebar text highlights stay Navy or Gold, not Dark Gray */
+.glass .text-teal-400,
+.glass span.text-teal-400,
+.glass a.text-teal-400 {
+  color: #1E3A8A !important;
+}
+
+/* Primary buttons text must remain white */
+.bg-teal-600,
+button.bg-teal-600,
+a.bg-teal-600,
+button[type="submit"],
+.bg-primary-600,
+.bg-primary-500 {
+  color: #FFFFFF !important;
+}
+.bg-teal-600 *,
+button.bg-teal-600 *,
+a.bg-teal-600 *,
+button[type="submit"] *,
+.bg-primary-600 *,
+.bg-primary-500 * {
+  color: #FFFFFF !important;
+}
+
+/* Primary buttons hover state: Darker Navy */
+.bg-teal-600:hover,
+button.bg-teal-600:hover,
+a.bg-teal-600:hover,
+button[type="submit"]:hover {
+  background-color: #172554 !important;
+  color: #FFFFFF !important;
+}
+
+/* Secondary buttons: White background with navy border and navy text */
+.border-slate-700,
+.border-slate-800:not(.glass) {
+  border-color: #1E3A8A !important;
+  background-color: #FFFFFF !important;
+  color: #1E3A8A !important;
+}
+.border-slate-700:hover,
+.border-slate-800:not(.glass):hover {
+  background-color: #FAFAF9 !important; /* Ivory background */
+  color: #172554 !important;
+}
+.border-slate-700 svg,
+.border-slate-800:not(.glass) svg {
+  color: #1E3A8A !important;
+}
+
+/* Hero Section: Navy Blue background with gold gradient text accents */
+.bg-gradient-to-br.from-teal-950\/45.via-navy-900.to-navy-950 {
+  background-image: linear-gradient(135deg, #1E3A8A 0%, #172554 100%) !important;
+  border-color: #1E3A8A !important;
+}
+.bg-gradient-to-br.from-teal-950\/45.via-navy-900.to-navy-950 h1,
+.bg-gradient-to-br.from-teal-950\/45.via-navy-900.to-navy-950 p,
+.bg-gradient-to-br.from-teal-950\/45.via-navy-900.to-navy-950 span:not(.bg-clip-text) {
+  color: #FFFFFF !important;
+}
+.from-teal-400.to-emerald-400 {
+  background-image: linear-gradient(to right, #D4AF37, #F59E0B) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+/* Form Inputs: White with light gray borders; focused state uses navy blue */
+input,
+select,
+textarea {
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  border-color: #E5E7EB !important;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1E3A8A !important;
+  box-shadow: 0 0 0 1.5px #1E3A8A !important;
+}
+
+/* Alert styles */
+/* Success Alerts (Emerald Green) */
+.bg-teal-950\/30,
+.bg-teal-950\/40 {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  color: #10B981 !important;
+}
+.bg-teal-950\/30 *,
+.bg-teal-950\/40 * {
+  color: #10B981 !important;
+}
+
+/* Error Alerts (Red) */
+.bg-red-950\/35,
+.bg-red-950\/30,
+.bg-red-950\/20 {
+  background-color: rgba(220, 38, 38, 0.08) !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+  color: #DC2626 !important;
+}
+.bg-red-950\/35 *,
+.bg-red-950\/30 *,
+.bg-red-950\/20 * {
+  color: #DC2626 !important;
+}
+
+/* Warning Alerts (Amber) */
+.bg-yellow-950\/35,
+.bg-yellow-950\/30,
+.bg-yellow-950\/20,
+.bg-yellow-500\/10 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+  color: #F59E0B !important;
+}
+.bg-yellow-950\/35 *,
+.bg-yellow-950\/30 *,
+.bg-yellow-950\/20 *,
+.bg-yellow-500\/10 * {
+  color: #F59E0B !important;
+}
+
+/* Leaflet map styling fixes */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  z-index: 10;
+}
+
+/* Animations */
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
