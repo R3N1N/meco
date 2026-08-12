@@ -45,7 +45,7 @@ const AdminInquiries = () => {
                   <span className="text-xs font-bold text-white flex items-center gap-1.5">
                     <User className="w-3.5 h-3.5 text-teal-400" /> {inq.name}
                   </span>
-                  <span className="text-[10px] text-slate-450 mt-0.5">{inq.email}</span>
+                  <span className="text-[10px] text-black mt-0.5">{inq.email}</span>
                 </div>
                 <div className="flex items-center gap-1 text-[10px] text-slate-500 font-mono">
                   <Clock className="w-3 h-3" />
