@@ -17,6 +17,8 @@ const BookAppointment = () => {
   const [selectedDoc, setSelectedDoc] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
 
+  const selectedDoctorObj = doctors.find(doc => String(doc.doctor_id) === String(selectedDoc));
+
   // Submit state
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState(null);
@@ -149,6 +151,11 @@ const BookAppointment = () => {
               <span className="text-xs font-bold text-black uppercase tracking-widest">{confirmedBooking.appointment_type} Visit</span>
             </div>
 
+            <div className="flex justify-between items-center pb-3 border-b border-slate-900">
+              <span className="text-xs text-black">Service Fee</span>
+              <span className="text-xs font-bold text-teal-400">Rs. {confirmedBooking.cost_price || (confirmedBooking.appointment_type === 'clinic' ? confirmedBooking.consultation_fee : '500.00')}</span>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-0.5">
                 <span className="text-[10px] text-black uppercase font-semibold">Date</span>
@@ -231,6 +238,9 @@ const BookAppointment = () => {
               <span className="text-[10px] text-white leading-normal">
                 Visit our office for tests with advanced diagnostic machinery.
               </span>
+              <span className="text-xs font-bold text-teal-450 mt-1">
+                Fee: {selectedDoctorObj ? `Rs. ${selectedDoctorObj.consultation_fee}` : 'Varies by doctor'}
+              </span>
             </button>
 
             <button
@@ -244,6 +254,7 @@ const BookAppointment = () => {
               <span className="text-[10px] text-white leading-normal">
                 A visual examiner travels to your pinned location. (10 AM - 6 PM)
               </span>
+              <span className="text-xs font-bold text-teal-450 mt-1">Fee: Rs. 500.00</span>
             </button>
           </div>
         </div>

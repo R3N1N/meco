@@ -164,6 +164,11 @@ const AdminAppointments = () => {
                         </div>
                       </div>
                     )}
+
+                    <div className="flex justify-between items-center text-xs font-semibold text-black bg-navy-950/20 p-2.5 rounded-lg border border-slate-900/40 mt-1">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Cost/Fee</span>
+                      <span className="text-teal-450 font-bold">Rs. {parseFloat(appt.cost_price || 0).toFixed(2)}</span>
+                    </div>
                   </div>
 
                   <div className="flex gap-2 border-t border-slate-900 pt-3 mt-1">
@@ -242,7 +247,7 @@ const AdminAppointments = () => {
               >
                 <option value="">-- Choose specialist --</option>
                 {doctors.map(doc => (
-                  <option key={doc.doctor_id} value={doc.doctor_id}>Dr. {doc.name} ({doc.specialization})</option>
+                  <option key={doc.doctor_id} value={doc.doctor_id}> {doc.name} ({doc.specialization})</option>
                 ))}
               </select>
             </div>

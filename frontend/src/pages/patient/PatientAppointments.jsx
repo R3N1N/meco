@@ -100,6 +100,11 @@ const PatientAppointments = () => {
                   </div>
                 )}
 
+                <div className="flex justify-between items-center bg-navy-950/40 p-2 rounded-lg border border-slate-900">
+                  <span className="text-[9px] text-slate-500 uppercase">Service Fee</span>
+                  <span className="text-xs text-teal-400 font-bold">Rs. {parseFloat(appt.cost_price || 0).toFixed(2)}</span>
+                </div>
+
                 {appt.notes && (
                   <div className="flex items-start gap-1.5 text-[11px] text-slate-400">
                     <FileText className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />

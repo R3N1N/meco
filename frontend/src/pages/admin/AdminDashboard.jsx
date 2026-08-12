@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, Users, Calendar, BarChart2, Shield, Settings, CheckCircle2, ShoppingBag } from 'lucide-react';
+import { Activity, Users, Calendar, BarChart2, Shield, Settings, CheckCircle2, ShoppingBag, Mail } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import API from '../../services/api';
 import AdminUsers from './AdminUsers';
 import AdminDoctors from './AdminDoctors';
 import AdminAppointments from './AdminAppointments';
 import AdminReports from './AdminReports';
+import AdminInquiries from './AdminInquiries';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -46,10 +47,11 @@ const AdminDashboard = () => {
             <div className="flex flex-col gap-1.5 mt-4">
               {[
                 { id: 'overview', label: 'Overview Metrics', icon: Activity },
-                { id: 'users', label: 'Manage Patients', icon: Users },
+                { id: 'users', label: 'Manage Users', icon: Users },
                 { id: 'doctors', label: 'Manage Doctors', icon: Shield },
                 { id: 'appointments', label: 'Appointments Queue', icon: Calendar },
                 { id: 'reports', label: 'Service Reports', icon: BarChart2 },
+                { id: 'inquiries', label: 'Contact Inquiries', icon: Mail },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -128,7 +130,7 @@ const AdminDashboard = () => {
 
               {/* Quick info panel */}
               <div className="bg-navy-900 border border-slate-850 rounded-2xl p-6 text-left flex flex-col gap-3">
-                <h4 className="text-xs font-bold text-white uppercase tracking-wider">System Settings Summary</h4>
+                <h4 className="text-xs font-bold text-black uppercase tracking-wider">System Settings Summary</h4>
                 <p className="text-xs text-slate-400 leading-relaxed max-w-2xl">
                   You are viewing the clinical operations board. Administrators hold privileges to override clinic dates, reassign specialists to bookings, modify user status, register clinical personnel, and inspect metrics diagrams.
                 </p>
@@ -145,6 +147,7 @@ const AdminDashboard = () => {
           {activeTab === 'doctors' && <AdminDoctors />}
           {activeTab === 'appointments' && <AdminAppointments />}
           {activeTab === 'reports' && <AdminReports />}
+          {activeTab === 'inquiries' && <AdminInquiries />}
         </div>
 
       </div>

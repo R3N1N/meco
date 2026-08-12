@@ -1,10 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import API from '../services/api';
 
 const Contact = () => {
-  const handleSubmit = (e) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Thank you for contacting EyeCare support. We will get back to you shortly.');
+    setLoading(true);
+    setError('');
+    try {
+      await API.post('/contacts', { name, email, subject, message });
+      alert('Thank you for contacting EyeCare support. We will get back to you shortly.');
+      setName('');
+      setEmail('');
+      setSubject('');
+      setMessage('');
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -113,6 +135,11 @@ const Contact = () => {
           </h3>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {error && (
+              <div className="bg-red-950/30 border border-red-900/40 text-red-400 text-xs p-3 rounded-lg">
+                {error}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
@@ -123,6 +150,8 @@ const Contact = () => {
                   required
                   type="text"
                   placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="bg-navy-950 text-slate-100 rounded-lg border border-slate-800 focus:outline-none focus:border-teal-500 p-2.5 text-xs"
                 />
               </div>
@@ -135,6 +164,8 @@ const Contact = () => {
                   required
                   type="email"
                   placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="bg-navy-950 text-slate-100 rounded-lg border border-slate-800 focus:outline-none focus:border-teal-500 p-2.5 text-xs"
                 />
               </div>
@@ -148,6 +179,8 @@ const Contact = () => {
                 required
                 type="text"
                 placeholder="Topic of inquiry"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
                 className="bg-navy-950 text-slate-100 rounded-lg border border-slate-800 focus:outline-none focus:border-teal-500 p-2.5 text-xs"
               />
             </div>
@@ -160,15 +193,18 @@ const Contact = () => {
                 required
                 rows={4}
                 placeholder="Type details of your inquiry here..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 className="bg-navy-950 text-slate-100 rounded-lg border border-slate-800 focus:outline-none focus:border-teal-500 p-2.5 text-xs resize-none"
               ></textarea>
             </div>
 
             <button
               type="submit"
-              className="bg-teal-600 hover:bg-teal-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-all mt-2"
+              disabled={loading}
+              className="bg-teal-600 hover:bg-teal-500 disabled:bg-teal-800 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-all mt-2"
             >
-              <Send className="w-4 h-4" /> Send Message
+              <Send className="w-4 h-4" /> {loading ? 'Sending...' : 'Send Message'}
             </button>
 
           </form>

@@ -11,6 +11,7 @@ const appointmentRoutes = require('./routes/appointmentRoutes');
 const prescriptionRoutes = require('./routes/prescriptionRoutes');
 const vaRoutes = require('./routes/vaRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +41,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/va-tests', vaRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/contacts', contactRoutes);
 
 // Unmatched route handlers
 app.use((req, res, next) => {
@@ -54,7 +56,7 @@ async function startServer() {
   try {
     // Check connection and seed database
     await db.initDb();
-    
+
     app.listen(PORT, () => {
       console.log(`===================================================`);
       console.log(`EyeCare API Service running on http://localhost:${PORT}`);

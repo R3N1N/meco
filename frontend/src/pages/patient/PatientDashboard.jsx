@@ -170,9 +170,14 @@ const PatientDashboard = () => {
                             <span className="leading-tight">{recentAppt.address}</span>
                           </div>
                         )}
-                        <span className="text-[10px] bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 rounded-full px-3 py-0.5 self-start uppercase font-bold tracking-wider">
-                          Status: {recentAppt.status}
-                        </span>
+                        <div className="flex justify-between items-center mt-1">
+                          <span className="text-[10px] bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 rounded-full px-3 py-0.5 self-start uppercase font-bold tracking-wider">
+                            Status: {recentAppt.status}
+                          </span>
+                          <span className="text-xs font-bold text-teal-400">
+                            Fee: Rs. {parseFloat(recentAppt.cost_price || 0).toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                     ) : (
                       <div className="py-6 text-center text-xs text-white flex flex-col items-center gap-2">

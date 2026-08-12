@@ -1,5 +1,15 @@
 const db = require('../config/db');
 
+// Helper to check if coordinates are within the valley (Kathmandu, Lalitpur, Bhaktapur)
+function isWithinValley(lat, lng) {
+  return (
+    Number(lat) >= 27.55 &&
+    Number(lat) <= 27.85 &&
+    Number(lng) >= 85.15 &&
+    Number(lng) <= 85.55
+  );
+}
+
 // Helper to convert time (HH:MM) to minutes since midnight
 function timeToMinutes(timeStr) {
   const [hours, minutes] = timeStr.split(':').map(Number);
@@ -173,11 +183,18 @@ exports.bookAppointment = async (req, res, next) => {
             throw new Error('This clinic slot is already booked');
           }
 
+          // Fetch doctor's fee
+          const [docRows] = await conn.query(
+            'SELECT consultation_fee FROM doctors WHERE id = ?',
+            [doctor_id]
+          );
+          const fee = docRows.length > 0 ? parseFloat(docRows[0].consultation_fee) : 0.00;
+
           // Insert appointment
           const [apptResult] = await conn.query(
-            `INSERT INTO appointments (patient_id, guest_name, guest_email, guest_phone, doctor_id, appointment_type, appointment_date, appointment_time, status, notes)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`,
-            [patient_id, guest_name || null, guest_email || null, guest_phone || null, doctor_id, 'clinic', appointment_date, slot.start_time, notes || '']
+            `INSERT INTO appointments (patient_id, guest_name, guest_email, guest_phone, doctor_id, appointment_type, appointment_date, appointment_time, status, notes, cost_price)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+            [patient_id, guest_name || null, guest_email || null, guest_phone || null, doctor_id, 'clinic', appointment_date, slot.start_time, notes || '', fee]
           );
 
           const newApptId = apptResult.insertId;
@@ -236,10 +253,10 @@ exports.bookAppointment = async (req, res, next) => {
             throw new Error('This time slot is already booked for a home service visit');
           }
 
-          // Insert home service appointment
+          // Insert home service appointment (cost_price = 500.00)
           const [apptResult] = await conn.query(
-            `INSERT INTO appointments (patient_id, guest_name, guest_email, guest_phone, appointment_type, appointment_date, appointment_time, status, address, latitude, longitude, notes)
-             VALUES (?, ?, ?, ?, 'home', ?, ?, 'pending', ?, ?, ?, ?)`,
+            `INSERT INTO appointments (patient_id, guest_name, guest_email, guest_phone, appointment_type, appointment_date, appointment_time, status, address, latitude, longitude, notes, cost_price)
+             VALUES (?, ?, ?, ?, 'home', ?, ?, 'pending', ?, ?, ?, ?, 500.00)`,
             [patient_id, guest_name || null, guest_email || null, guest_phone || null, appointment_date, appointment_time, address, latitude, longitude, notes || '']
           );
 
@@ -419,11 +436,19 @@ exports.editAppointment = async (req, res, next) => {
       }
 
       // 2. Perform main update
+      let newCost = appt.cost_price;
+      if (appt.appointment_type === 'clinic' && doctor_id && doctor_id !== appt.doctor_id) {
+        const [docRows] = await conn.query('SELECT consultation_fee FROM doctors WHERE id = ?', [doctor_id]);
+        if (docRows.length > 0) {
+          newCost = parseFloat(docRows[0].consultation_fee);
+        }
+      }
+
       await conn.query(
         `UPDATE appointments 
-         SET appointment_date = ?, appointment_time = ?, doctor_id = ?, status = ?
+         SET appointment_date = ?, appointment_time = ?, doctor_id = ?, status = ?, cost_price = ?
          WHERE id = ?`,
-        [appointment_date, appointment_time, doctor_id || null, status || appt.status, id]
+        [appointment_date, appointment_time, doctor_id || null, status || appt.status, newCost, id]
       );
     });
 

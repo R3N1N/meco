@@ -25,10 +25,10 @@ async function query(sql, params = []) {
     // SQLite query execution wrapper
     return new Promise((resolve, reject) => {
       const isMutating = /^\s*(insert|update|delete)/i.test(sql);
-      
+
       // Convert standard placeholder '?' mapping (SQLite handles ? out-of-the-box)
       if (isMutating) {
-        sqliteDb.run(sql, params, function(err) {
+        sqliteDb.run(sql, params, function (err) {
           if (err) {
             console.error('SQLite Run Error:', err, 'SQL:', sql);
             reject(err);
@@ -79,7 +79,7 @@ async function transaction(callback) {
                 return new Promise((res, rej) => {
                   const isMutating = /^\s*(insert|update|delete)/i.test(sql);
                   if (isMutating) {
-                    sqliteDb.run(sql, params, function(e) {
+                    sqliteDb.run(sql, params, function (e) {
                       if (e) rej(e);
                       else res([{ insertId: this.lastID, affectedRows: this.changes }, null]);
                     });
@@ -111,7 +111,7 @@ async function transaction(callback) {
 // Convert schema creation scripts to SQLite syntax if database is SQLite
 function adaptSql(sql) {
   if (dbType === 'mysql') return sql;
-  
+
   let sqliteSql = sql
     .replace(/INT AUTO_INCREMENT PRIMARY KEY/gi, 'INTEGER PRIMARY KEY AUTOINCREMENT')
     .replace(/INT/g, 'INTEGER')
@@ -123,14 +123,14 @@ function adaptSql(sql) {
     .replace(/BOOLEAN DEFAULT TRUE/gi, 'INTEGER DEFAULT 1')
     .replace(/FOREIGN KEY\s*\(([^)]+)\)\s*REFERENCES\s*(\w+)\s*\(([^)]+)\)\s*ON DELETE SET NULL/gi, 'FOREIGN KEY ($1) REFERENCES $2($3) ON DELETE SET NULL')
     .replace(/FOREIGN KEY\s*\(([^)]+)\)\s*REFERENCES\s*(\w+)\s*\(([^)]+)\)\s*ON DELETE CASCADE/gi, 'FOREIGN KEY ($1) REFERENCES $2($3) ON DELETE CASCADE');
-    
+
   return sqliteSql;
 }
 
 // Initialize Database Connection and Tables
 async function initDb() {
   console.log(`Configuring database connection... Specified type: ${dbType}`);
-  
+
   let connected = false;
 
   if (dbType === 'mysql' && !useSqliteFallback) {
@@ -145,7 +145,7 @@ async function initDb() {
         connectionLimit: 10,
         queueLimit: 0
       });
-      
+
       // Test MySQL connection
       const conn = await mysqlPool.getConnection();
       console.log('Successfully connected to MySQL database.');
@@ -229,6 +229,7 @@ async function initDb() {
       latitude DECIMAL(10, 8),
       longitude DECIMAL(11, 8),
       notes TEXT,
+      cost_price DECIMAL(10, 2) DEFAULT 0.00,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (patient_id) REFERENCES users(id) ON DELETE SET NULL,
@@ -305,9 +306,40 @@ async function initDb() {
     const adapted = adaptSql(schema);
     await query(adapted);
   }
-  
+
+  // Migration to add cost_price to appointments if it doesn't exist
+  try {
+    if (dbType === 'mysql') {
+      await query("ALTER TABLE appointments ADD COLUMN cost_price DECIMAL(10,2) DEFAULT 0.00");
+    } else {
+      await query("ALTER TABLE appointments ADD COLUMN cost_price REAL DEFAULT 0.00");
+    }
+    console.log('Added cost_price column to appointments table.');
+
+    // Backfill existing clinic appointments
+    await query(`
+      UPDATE appointments
+      SET cost_price = (
+        SELECT consultation_fee 
+        FROM doctors 
+        WHERE doctors.id = appointments.doctor_id
+      )
+      WHERE appointment_type = 'clinic' AND (cost_price IS NULL OR cost_price = 0)
+    `);
+
+    // Backfill existing home appointments
+    await query(`
+      UPDATE appointments
+      SET cost_price = 500.00
+      WHERE appointment_type = 'home' AND (cost_price IS NULL OR cost_price = 0)
+    `);
+    console.log('Successfully backfilled cost_price for existing appointments.');
+  } catch (err) {
+    // Column already exists or error, ignore/handle gracefully
+  }
+
   console.log('Database tables verified/created successfully.');
-  
+
   // Seed database
   await seedDatabase();
 }
@@ -318,24 +350,24 @@ async function seedDatabase() {
     const [users] = await query('SELECT * FROM users WHERE email = ?', ['admin@eyecare.com']);
     if (users.length === 0) {
       console.log('Seeding initial system users...');
-      
+
       const adminPass = await bcrypt.hash('admin123', 10);
       const docPass = await bcrypt.hash('doctor123', 10);
       const patientPass = await bcrypt.hash('patient123', 10);
-      
+
       // 1. Seed Admin
       const [adminResult] = await query(
         'INSERT INTO users (name, email, password, role, phone, address, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
         ['System Admin', 'admin@eyecare.com', adminPass, 'admin', '555-0100', '123 EyeCare HQ, Vision City', 'active']
       );
-      
+
       // 2. Seed Doctor
       const [docUserResult] = await query(
         'INSERT INTO users (name, email, password, role, phone, address, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
         ['Dr. Sarah Miller', 'doctor@eyecare.com', docPass, 'doctor', '555-0101', 'Clinic Suite 4A, Medical Center', 'active']
       );
       const docUserId = docUserResult.insertId;
-      
+
       // Create Doctor details
       const [docProfileResult] = await query(
         'INSERT INTO doctors (user_id, specialization, experience_years, biography, consultation_fee) VALUES (?, ?, ?, ?, ?)',
@@ -354,13 +386,13 @@ async function seedDatabase() {
         'INSERT INTO doctors (user_id, specialization, experience_years, biography, consultation_fee) VALUES (?, ?, ?, ?, ?)',
         [doc2UserId, 'Ophthalmologist & Eye Surgeon', 15, 'Dr. John Watson specializes in advanced cataract surgery and glaucoma treatments.', 120.00]
       );
-      
+
       // 3. Seed Patient
       await query(
         'INSERT INTO users (name, email, password, role, phone, address, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
         ['Mark Davis', 'patient@eyecare.com', patientPass, 'patient', '555-0102', '742 Evergreen Terrace, Springfield', 'active']
       );
-      
+
       // 4. Seed doctor schedules (Sarah Miller on Mon, Wed, Fri 10:00 to 17:00)
       const weekDays = ['Monday', 'Wednesday', 'Friday'];
       for (const day of weekDays) {
@@ -369,7 +401,7 @@ async function seedDatabase() {
           [doctorId, day, '10:00', '17:00', 15]
         );
       }
-      
+
       console.log('Seeding completed successfully.');
     } else {
       console.log('Admin account found. Seeding skipped.');

@@ -15,5 +15,6 @@ router.put('/doctors/:id', adminController.editDoctor);
 router.delete('/doctors/:id', adminController.deleteDoctor);
 
 router.get('/reports', adminController.getReports);
+router.get('/contacts', adminController.getContacts);
 
 module.exports = router;

@@ -221,3 +221,15 @@ exports.getReports = async (req, res, next) => {
     next(error);
   }
 };
+
+// Get all contact inquiries (Admin only)
+exports.getContacts = async (req, res, next) => {
+  try {
+    const [contacts] = await db.query(
+      'SELECT id, name, email, subject, message, created_at FROM contact_inquiries ORDER BY created_at DESC'
+    );
+    res.json(contacts);
+  } catch (error) {
+    next(error);
+  }
+};
